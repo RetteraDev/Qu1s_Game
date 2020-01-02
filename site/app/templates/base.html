@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    <nav id="navbar-example2" class="navbar navbar-dark bg-dark">
+        <div>
+            <a class="navbar-brand text-center" href = '/'>QuestGame</a>
+        </div>
+    </nav>
+
+      {%block content%}
+      {%endblock%}
+
+    <style>
+
+        .alert {
+          animation-delay: 2s;
+          animation-duration: 3s;
+          animation-fill-mode: both;
+          animation-name: fadeOut;
+          align-content: bottom;
+        }
+
+        @keyframes fadeOut {
+           0% {opacity: 1;}
+           100% {opacity: 0;}
+        }
+
+        .centered {
+            width: 250px;
+            height: 250px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+        }
+    </style>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="position: absolute; top: 55px; right: 0;">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+</body>
+</html>

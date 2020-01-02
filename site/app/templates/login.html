@@ -1,0 +1,26 @@
+{%extends "base.html"%}
+{%block content%}
+<div class="centered">
+    <form method="POST">
+        <div class="badge badge-dark text-wrap" style="width: 250px;">
+            Имя
+        </div>
+
+        <div class="input-group">
+            <input type="text" name="name" class="form-control" placeholder="Как мне тебя называть?" required="">
+        </div>
+
+        <div class="badge badge-dark text-wrap mt-3" style="width: 250px;">
+            Код комнаты
+        </div>
+
+        <div class="input-group">
+            <input type="text" name="code" class="form-control" placeholder="4-ех буквенный код" required="">
+        </div>
+
+        <button type="submit" class="btn btn-dark btn-block mt-3">Войти</button>
+        
+        <p class="mt-2 mb-3 text-muted text-center" text-align="center">© 2019</p>
+    </form> 
+</div>
+{%endblock%}
