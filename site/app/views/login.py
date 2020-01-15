@@ -27,7 +27,7 @@ def login():
                 db.session.add(player)
                 db.session.commit()
                 login_user(player, remember=True)
-                socketio.emit('new_user', current_user.name)
+
                 return redirect(url_for('game', code=code))
             
         else:
