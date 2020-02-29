@@ -11,6 +11,7 @@ players = []
 submit_code = ''
 
 def new_user(name):
+    print('blyat', name)
     if name not in players:
         players.append(name)
 
@@ -24,8 +25,9 @@ def get_code(code):
 
 
 socketIO.emit('new_room')
-socketIO.on('get_code', get_code)
-socketIO.wait(seconds=2)
+socketIO.on('get_room_code', get_code)
+socketIO.wait(seconds=1)
+
 #########################
 
 
@@ -45,15 +47,17 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 
+
+
 running = True
 
 while running:
     
     # Checking new users
+
     socketIO.on('new_user', new_user)
     socketIO.on('left_user', left_user)
     socketIO.wait(seconds=1)
-    
     screen.fill(WHITE)
     
     for event in pygame.event.get():

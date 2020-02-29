@@ -1,4 +1,4 @@
-from models.Games import *
+from models.Games import Rooms, Users
 from app import db
 
 

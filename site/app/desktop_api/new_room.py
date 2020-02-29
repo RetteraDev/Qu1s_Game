@@ -11,4 +11,4 @@ def new_room():
     
     db.session.add(Rooms(code))
     db.session.commit()
-    emit('get_code', code)
+    emit('get_room_code', code)

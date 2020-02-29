@@ -1,4 +1,33 @@
 {%extends "base.html"%}
 {%block content%}
-    <p>Откинься на спинку кресла и приготовься к игре</p>
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+	var socket = io.connect('http://192.168.43.217:8080/');
+
+    socket.emit('join', { 'name': '{{ current_user.name }}', 'room': '{{ current_user.code }}' });
+
+    socket.on('task_browser', data => {
+        $("#messages").append('<li>'+data.task+'</li>');
+        console.log(data);
+    });
+
+    socket.on('message', function(msg) {
+		console.log('Received message');
+	});
+
+	$('#sendbutton').on('click', function() {
+        socket.emit('send_answer', {{ current_user.code }});
+		$('#myMessage').val('');
+	});
+    //$('#myMessage').val()
+});
+</script>
+
+<ul id="messages"></ul>
+<input type="text" id="myMessage">
+<button id="sendbutton">Send</button>
+
 {%endblock%}
