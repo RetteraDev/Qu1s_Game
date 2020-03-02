@@ -1,10 +1,11 @@
 from socketIO_client import SocketIO
+import threading
 
 
 players = []
 room_code = ''
         
-class Socket:
+class Socket(threading.Thread):
     
     def __call__(self):
         
@@ -37,3 +38,7 @@ class Socket:
             players.remove(name)
             self.queue.put({'players':players})
             #print(f'[{name} exit room {room_code}]')
+    
+    @staticmethod
+    def test(f):
+        print("SOCKET:",f)

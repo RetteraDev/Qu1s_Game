@@ -11,7 +11,6 @@ players = []
 submit_code = ''
 
 def new_user(name):
-    print('blyat', name)
     if name not in players:
         players.append(name)
 

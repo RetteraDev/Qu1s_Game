@@ -1,6 +1,7 @@
 import random
 from datetime import datetime, timedelta
-from multiprocessing import Process, Queue
+from threading import Thread
+from multiprocessing import Queue
 import requests
 
 import os
@@ -22,6 +23,7 @@ class Qu1s(Game):
     def __init__(self):
         Game.__init__(self, 'Breakout', c.frame_rate)
         self.state = 'MENU'
+        self.paused = False
         self.menu_buttons = []
         self.info = pygame.display.Info()
         self.max_width = self.info.current_w
@@ -93,31 +95,23 @@ class Qu1s(Game):
 
             self.state = 'MENU'
             self.change_background = True
-            
-        def on_exit(button):
-            self.menu_buttons = []
-            self.objects = []
-
-            self.state = 'EXIT'
-            self.game_over = True
-            self.is_game_running = False
-
         
 
         if self.change_background: 
             
             if self.room_code == '':
-                sockets = Process(target = Socket(self.queue,))
-                sockets.daemon = True
-                sockets.start()
+                self.sockets = Thread(target = Socket(self.queue,))
+                self.sockets.daemon = True
+                self.sockets.start()
+
                 while not self.queue.empty():
                     self.room_code = self.queue.get()['code']
                 
-            self.background_image = pygame.image.load('desktop/images/backgrounds/lobby_menu.jpg')
-            #self.background_image = pygame.image.load('../images/backgrounds/lobby_menu.jpg')
+            self.background_image = pygame.image.load('desktop/images/backgrounds/lobby.jpg')
+            #self.background_image = pygame.image.load('../images/backgrounds/lobby.jpg')
             self.background_image = pygame.transform.scale(self.background_image, (self.max_width, self.max_height))
             
-            for i, (text, click_handler) in enumerate((('Start', on_play),('Exit', on_return), ('Exit', on_exit))): #СМЕНИТЬ КНОПКУ
+            for i, (text, click_handler) in enumerate((('Start', on_play),('Back', on_return))):
                 b = Button(c.menu_offset_x,
                         c.menu_offset_y + (c.menu_button_h+5) * i,
                         c.menu_button_w,
@@ -130,19 +124,62 @@ class Qu1s(Game):
                 
             self.change_background = False
 
-
     def create_game(self):
-        self.background_image = pygame.image.load('desktop/images/backgrounds/main_menu.jpg')
-        pass        
+        
+        def on_return(button):
+            self.menu_buttons = []
+            self.objects = []
 
+            self.state = 'MENU'
+            self.change_background = True
+            
+        if self.change_background: 
+            self.background_image = pygame.image.load('desktop/images/backgrounds/game.jpg')
+
+            for i, (text, click_handler) in enumerate((('Back', on_return), )):
+                b = Button(c.menu_offset_x,
+                        c.menu_offset_y + (c.menu_button_h+5) * i,
+                        c.menu_button_w,
+                        c.menu_button_h,
+                        text,
+                        click_handler)
+                self.objects.append(b)
+                self.menu_buttons.append(b)
+                self.mouse_handlers.append(b.handle_mouse_event)
+            
+            self.change_background = False
+       
     def create_settings(self):
-        self.background_image = pygame.image.load('desktop/images/backgrounds/main_menu.jpg')
-        pass   
-    
+        
+        def on_return(button):
+            self.menu_buttons = []
+            self.objects = []
+
+            self.state = 'MENU'
+            self.change_background = True
+            
+        if self.change_background: 
+            self.background_image = pygame.image.load('desktop/images/backgrounds/settings.jpg')
+
+            for i, (text, click_handler) in enumerate((('Back', on_return), )):
+                b = Button(c.menu_offset_x,
+                        c.menu_offset_y + (c.menu_button_h+5) * i,
+                        c.menu_button_w,
+                        c.menu_button_h,
+                        text,
+                        click_handler)
+                self.objects.append(b)
+                self.menu_buttons.append(b)
+                self.mouse_handlers.append(b.handle_mouse_event)  
+                
+        self.change_background = False
+       
     def update(self):
         
         if not self.queue.empty():
-            print('QUEUE:',self.queue.get())
+            temp = self.queue.get()
+            print('QUEUE:',temp)
+            Socket.test(temp)
             
         if self.state == 'MENU':
             self.create_menu()
@@ -160,6 +197,8 @@ class Qu1s(Game):
             self.show_message('GAME OVER!', centralized=True)
 
     def show_message(self, text, color=colors.WHITE, font_name='Arial', font_size=20, centralized=False):
+        
+        
         message = TextObject(c.screen_width // 2, c.screen_height // 2, lambda: text, color, font_name, font_size)
         self.draw()
         message.draw(self.surface, centralized)
