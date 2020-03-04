@@ -1,6 +1,15 @@
 {%extends "base.html"%}
 {%block content%}
-
+<nav id="navbar-example2" class="navbar navbar-dark bg-dark">
+    <div>
+        <a class="navbar-brand text-center" href = '/'>{{ current_user.name }}</a>
+    </div>
+    {%if current_user.is_authenticated%}
+        <div>
+            <a class="navbar-brand text-center" href = '/logout'>Выход</a>
+        </div>
+    {%endif%}
+</nav>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -9,7 +18,7 @@ $(document).ready(function() {
 
     socket.emit('join', { 'name': '{{ current_user.name }}', 'room': '{{ current_user.code }}' });
 
-    socket.on('task_browser', data => {
+    socket.on('new_task_to_player', data => {
         $("#messages").append('<li>'+data.task+'</li>');
         console.log(data);
     });
@@ -19,7 +28,7 @@ $(document).ready(function() {
 	});
 
 	$('#sendbutton').on('click', function() {
-        socket.emit('send_answer', {{ current_user.code }});
+        socket.emit('new_answer_from_player', {{ current_user.name }});
 		$('#myMessage').val('');
 	});
     //$('#myMessage').val()

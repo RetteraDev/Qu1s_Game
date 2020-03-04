@@ -1,6 +1,6 @@
-# PartyGame
+# Qu1s Game
 
-![](https://img.shields.io/github/stars/Qu1s/PartyGame?style=for-the-badge) ![](https://img.shields.io/github/forks/Qu1s/PartyGame?style=for-the-badge) ![](https://img.shields.io/github/issues/Qu1s/PartyGame?style=for-the-badge) ![](https://img.shields.io/github/license/Qu1s/PartyGame?style=for-the-badge)
+![](https://img.shields.io/github/stars/Qu1s/Qu1s_Game?style=for-the-badge) ![](https://img.shields.io/github/forks/Qu1s/Qu1s_Game?style=for-the-badge) ![](https://img.shields.io/github/issues/Qu1s/Qu1s_Game?style=for-the-badge) ![](https://img.shields.io/github/license/Qu1s/Qu1s_Game?style=for-the-badge)
 
 ### What is it?
 It is game for company(2-8 players), where you can spend time with your friends by playing different small rounds.

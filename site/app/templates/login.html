@@ -1,5 +1,17 @@
 {%extends "base.html"%}
 {%block content%}
+
+<nav id="navbar-example2" class="navbar navbar-dark bg-dark">
+    <div>
+        <a class="navbar-brand text-center" href = '/'>Qu1s</a>
+    </div>
+    {%if current_user.is_authenticated%}
+        <div>
+            <a class="navbar-brand text-center" href = '/logout'>Выход</a>
+        </div>
+    {%endif%}
+</nav>
+
 <div class="centered">
     <form method="POST">
         <div class="badge badge-dark text-wrap" style="width: 250px;">

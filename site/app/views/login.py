@@ -22,6 +22,10 @@ def login():
             if bool(Users.query.filter_by(name=name).first()):
                 flash('Имя уже занято', 'danger') 
                 
+            elif len(Rooms.query.filter_by(code=code).all()) == 8:
+                flash('Комната уже полна', 'danger')
+                return redirect(url_for('login'))
+            
             else:
                 player = Users(code, name)
                 db.session.add(player)

@@ -7,20 +7,22 @@ room_code = ''
         
 class Socket(threading.Thread):
     
-    def __call__(self):
-        
-        socketIO = SocketIO('192.168.43.217', 8080)
-        
-        socketIO.emit('new_room')
-        socketIO.on('get_room_code', self.get_room_code)
-        socketIO.on('new_user', self.new_user)
-        socketIO.on('left_user', self.left_user)
-        socketIO.wait() 
-
-        
     def __init__(self, queue):
+        
+        self.socketIO = SocketIO('192.168.43.217', 8080)
+        
+        self.socketIO.emit('new_room')
+        self.socketIO.on('get_room_code', self.get_room_code)
+        self.socketIO.on('new_user', self.new_user)
+        self.socketIO.on('left_user', self.left_user)
+        self.socketIO.on('new_answer_to_game', self.new_answer)
+        
         self.queue = queue
-
+        self.running = True
+    
+    def run(self):
+        while self.running:
+            self.socketIO.wait() 
     
     def get_room_code(self, code):
         print(code)
@@ -31,13 +33,17 @@ class Socket(threading.Thread):
         if name not in players:
             players.append(name)
             self.queue.put({'players':players})
-            #print(f'[{name} joined room {room_code}]')
 
     def left_user(self, name):
         if name in players:
             players.remove(name)
             self.queue.put({'players':players})
-            #print(f'[{name} exit room {room_code}]')
+    
+    def new_answer(self, answer):
+        self.queue.put({'answer':answer})
+    
+    def terminate(self):
+        self.running = False
     
     @staticmethod
     def test(f):

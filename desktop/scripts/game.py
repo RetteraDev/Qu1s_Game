@@ -8,13 +8,15 @@ class Game:
     def __init__(self, caption, frame_rate):
         self.frame_rate = frame_rate
         self.game_over = False
+        
+        self.player_objects = []
         self.objects = []
         pygame.mixer.init(44100, -16, 2, 4096)
         pygame.init()
         
         info = pygame.display.Info()
-        max_width = 1280#info.current_w
-        max_height = 720#info.current_h
+        max_width = info.current_w
+        max_height = info.current_h
         
         pygame.font.init()
         self.surface = pygame.display.set_mode((max_width, max_height)) #, pygame.FULLSCREEN
@@ -27,9 +29,15 @@ class Game:
     def update(self):
         for o in self.objects:
             o.update()
+        
+        for o in self.player_objects:
+            o.update()
 
     def draw(self):
         for o in self.objects:
+            o.draw(self.surface)
+
+        for o in self.player_objects:
             o.draw(self.surface)
 
     def handle_events(self):

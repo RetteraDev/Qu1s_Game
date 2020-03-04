@@ -9,16 +9,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 </head>
 <body>
-    <nav id="navbar-example2" class="navbar navbar-dark bg-dark">
-        <div>
-            <a class="navbar-brand text-center" href = '/'>PartyGame</a>
-        </div>
-        {%if current_user.is_authenticated%}
-            <div>
-                <a class="navbar-brand text-center" href = '/logout'>Выход</a>
-            </div>
-        {%endif%}
-    </nav>
 
       {%block content%}
       {%endblock%}

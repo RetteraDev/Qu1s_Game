@@ -16,7 +16,7 @@ def game(code):
         return redirect(url_for('login'))
     
     elif bool(Rooms.query.filter_by(code=code).first()):
-        join_room(code, sid = current_user.name, namespace='/')
+        join_room(str(code), sid = current_user.name, namespace='/')
         socketio.emit('new_user', current_user.name, room=str(code))
         return render_template('game.html')
     else:
@@ -34,7 +34,8 @@ def logout():
     
     flash('Вы вышли', 'success')
     return redirect(url_for('login'))
- 
+
+# Игрок заходит в комнату
 @socketio.on('join')
 def on_join(data):
     name = str(data['name'])
@@ -43,10 +44,12 @@ def on_join(data):
     print(data)
     send(name + ' has entered the room.', room=room)
     
-@socketio.on('task')
-def task(a):
-    emit("task_browser", a, broadcast=True, room = a['room'])
+# Задания приходят в комнату
+@socketio.on('new_task_from_game')
+def new_task_from_game(a):
+    emit("new_task_to_player", a, broadcast=True, room = a['room'])
     
-@socketio.on('send message')
-def aaa(a):
-    emit('message', a, broadcast = True, room = str(current_user.code))
+# Задания приходят в игровой клиент
+@socketio.on('new_answer_from_player')
+def new_answer_from_player(a):
+    emit('new_answer_to_game', a, broadcast = True, room = str(current_user.code))
