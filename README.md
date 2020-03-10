@@ -11,7 +11,7 @@ source venv/bin/activate
 
 
 - Install requirements.txt with pip 
->pip3 install < requirements.txt
+>pip3 install -r requirements.txt
 
 - Create site/app/secret.py file and enter
 > secret_key  = "YOUR_SECRET_KEY"
@@ -30,3 +30,8 @@ source venv/bin/activate
 - Make code better and cleaner
 - Write documentation
 - Debugging
+
+### Bugs
+- assert response.content == b'ok' (AssertionError)
+>Enter "pip install -U socketIO-client" to your console/terminal
+>This is problem of this module

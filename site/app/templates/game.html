@@ -23,6 +23,13 @@ $(document).ready(function() {
         console.log(data);
     });
 
+    socket.on('leave', function(msg) {
+        {%if current_user.is_authenticated%}
+            window.location.replace("http://192.168.43.217:8080/logout");
+        {%endif%}
+    });
+    
+
     socket.on('message', function(msg) {
 		console.log('Received message');
 	});

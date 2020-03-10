@@ -23,17 +23,20 @@ def game(code):
         return redirect(url_for('login'))
 
 
-@app.route('/logout')
-@login_required
+@app.route('/logout', methods = ['GET', 'POST'])
 def logout():
-    leave_room(str(current_user.code), sid = current_user.name, namespace='/')
-    socketio.emit('left_user', current_user.name, room=str(current_user.code))
-    db.session.delete(Users.query.filter_by(name=current_user.name).first())
-    db.session.commit()
-    logout_user()
     
-    flash('Вы вышли', 'success')
-    return redirect(url_for('login'))
+    if current_user.is_anonymous:
+        return redirect(url_for('login'))
+    else:
+        leave_room(str(current_user.code), sid = current_user.name, namespace='/')
+        socketio.emit('left_user', current_user.name, room=str(current_user.code))
+        db.session.delete(Users.query.filter_by(name=current_user.name).first())
+        db.session.commit()
+        logout_user()
+        
+        flash('Вы вышли', 'success')
+        return redirect(url_for('login'))
 
 # Игрок заходит в комнату
 @socketio.on('join')
@@ -41,14 +44,12 @@ def on_join(data):
     name = str(data['name'])
     room = str(data['room'])
     join_room(room)
-    print(data)
-    send(name + ' has entered the room.', room=room)
-    
+
 # Задания приходят в комнату
 @socketio.on('new_task_from_game')
 def new_task_from_game(a):
     emit("new_task_to_player", a, broadcast=True, room = a['room'])
-    
+
 # Задания приходят в игровой клиент
 @socketio.on('new_answer_from_player')
 def new_answer_from_player(a):

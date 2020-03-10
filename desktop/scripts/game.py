@@ -1,7 +1,8 @@
+from collections import defaultdict
+from pygame.locals import *
 import pygame
 import sys
 
-from collections import defaultdict
 
 
 class Game:
@@ -11,7 +12,7 @@ class Game:
         
         self.player_objects = []
         self.objects = []
-        pygame.mixer.init(44100, -16, 2, 4096)
+        
         pygame.init()
         
         info = pygame.display.Info()

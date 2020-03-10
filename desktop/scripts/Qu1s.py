@@ -33,33 +33,37 @@ class Qu1s(Game):
         self.change_players = True
         
         self.queue = Queue()
+        self.stop_socket = False
         
         self.room_code = ''
         self.players = []
         self.update()
         
+        pygame.mixer.music.load('desktop/sounds/main_theme.mp3')
+        pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(0.5)
 
+    # Зануляем все отрисованные объекты
+    def clearing(self, state):
+        
+        self.mouse_handlers = []
+        self.player_objects = []
+        self.menu_buttons = []
+        self.objects = []
+        self.state = state
+        self.change_background = True
+    
     def create_menu(self):
         
         def on_lobby(button):
-            self.menu_buttons = []
-            self.objects = []
-
-            self.state = 'LOBBY'
-            self.change_background = True
+            self.clearing('LOBBY')
             
         def on_settings(button):
-            self.menu_buttons = []
-            self.objects = []
-
-            self.state = 'SETTINGS'
-            self.change_background = True
+            self.clearing('SETTINGS')
             
         def on_exit(button):
-            self.menu_buttons = []
-            self.objects = []
+            self.clearing('EXIT')
             
-            self.state = 'EXIT'
             self.game_over = True
             self.is_game_running = False
 
@@ -86,39 +90,42 @@ class Qu1s(Game):
     def create_lobby(self):
         
         def on_play(button):
-            self.player_objects = []
-            self.menu_buttons = []
-            self.objects = []
+            self.clearing('START')
 
-            self.state = 'START'
-            self.change_background = True
+            # Начинает музыку с нуля, ставит на паузу
+            pygame.mixer.music.rewind()
+            pygame.mixer.music.pause()
             
         def on_return(button):
-            self.player_objects = []
-            self.menu_buttons = []
-            self.objects = []
             
-            self.state = 'MENU'
-            self.change_background = True
+            self.clearing('MENU')
+            self.players = []
+
             self.room_code = ''
+            self.socket.close_room()
+
 
         # Если комната рисуется впервые
         if self.change_background or self.change_players: 
             
             if self.room_code == '':
                 
-                self.sockets = Thread(target = Socket(self.queue).run)
-                self.sockets.daemon = True
-                self.sockets.start()
-                self.sockets.running = False
+                # Запускаем поток сокетов
+                self.socket = Socket(self.queue)
+                self.socket.setDaemon(True)
+                self.socket.start()
                 
+                # Ждем, когда придет код комнаты
+                #@todo Сделать выход в главное меню, если ждет код дольше 3ех секунд
                 while self.queue.empty():
                     time.sleep(0.1)
-                    
+                
+                # Получаем код из очереди
                 temp = self.queue.get()
                 self.room_code = f"Код: {str(temp['code'])}"
                     #print(self.room_code)
             
+            # Подгружаем фон и масштабируем на весь экран
             self.background_image = pygame.image.load('desktop/images/backgrounds/lobby.jpg')
             #self.background_image = pygame.image.load('../images/backgrounds/lobby.jpg')
             self.background_image = pygame.transform.scale(self.background_image, (self.max_width, self.max_height))
@@ -159,16 +166,21 @@ class Qu1s(Game):
     def create_game(self):
         
         def on_return(button):
-            self.menu_buttons = []
-            self.objects = []
-
-            self.state = 'MENU'
-            self.change_background = True
+            
+            self.clearing('MENU')
             self.room_code = ''
+            self.socket.close_room()
+            
+            # Музыка снимается с паузы
+            pygame.mixer.music.unpause()
+            
             
         if self.change_background: 
+            
+            # Подгружаем фон и масштабируем на весь экран
             self.background_image = pygame.image.load('desktop/images/backgrounds/game.jpg')
-
+            self.background_image = pygame.transform.scale(self.background_image, (self.max_width, self.max_height))
+            
             back = Button(0, 0,
                           c.menu_button_w, c.menu_button_h,
                           'Back',
@@ -191,19 +203,19 @@ class Qu1s(Game):
     def create_settings(self):
         
         def on_return(button):
-            self.menu_buttons = []
-            self.objects = []
-
-            self.state = 'MENU'
-            self.change_background = True
+            
+            self.clearing('MENU')
+            
             
         if self.change_background: 
             self.background_image = pygame.image.load('desktop/images/backgrounds/settings.jpg')
+            self.background_image = pygame.transform.scale(self.background_image, (self.max_width, self.max_height))
 
-            back = Button(0, 0,
-                          c.menu_button_w, c.menu_button_h,
-                          'Back',
-                          on_return)
+            back = Button(0, 0,                             # Положение кнопки на экране
+                          c.menu_button_w, c.menu_button_h, # Размеры кнопки
+                          'Back',                           # Текст кнопки, нужен для импорта изображения
+                          on_return)                        # Функция обработчик при нажатии на кнопку
+            
             self.objects.append(back)
             self.menu_buttons.append(back)
             self.mouse_handlers.append(back.handle_mouse_event)
@@ -223,6 +235,7 @@ class Qu1s(Game):
 
             elif 'answer' in temp:
                 print('QUEUE:',temp)
+            #@todo Отправка ответа на сервер
             # Socket.test(temp)
             
         if self.state == 'MENU':

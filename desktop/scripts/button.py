@@ -1,13 +1,12 @@
-import pygame
-
-
 from game_object import GameObject
 from text_object import TextObject
 import config as c
+import pygame
 
 
 class Button(GameObject):
     def __init__(self, x, y, w, h, text, on_click=lambda x: None):
+
         self.button_name = text
         self.x = x
         self.y = y
@@ -19,7 +18,7 @@ class Button(GameObject):
         self.normal = pygame.image.load(f"desktop/Buttons/{self.button_name}.png")
         self.clicked = pygame.image.load(f"desktop/Buttons/{self.button_name}_clicked.png")
         self.hovered = pygame.image.load(f"desktop/Buttons/{self.button_name}_hovered.png")
-
+        self.button_hovered_play = True
 
     @property
     def back_color(self):
@@ -44,12 +43,18 @@ class Button(GameObject):
         if self.bounds.collidepoint(pos):
             if self.state != 'clicked':
                 self.state = 'hovered'
+                
+            if self.button_hovered_play:
+                c.button_hovered.play(0)
+                self.button_hovered_play = False
         else:
             self.state = 'normal'
+            self.button_hovered_play = True
 
     def handle_mouse_down(self, pos):
         if self.bounds.collidepoint(pos):
             self.state = 'clicked'
+            c.button_clicked.play(0)
             
     def handle_mouse_up(self, pos):
         if self.state == 'clicked':

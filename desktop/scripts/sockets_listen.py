@@ -1,14 +1,12 @@
 from socketIO_client import SocketIO
-import threading
+from threading import Thread
 
 
-players = []
-room_code = ''
-        
-class Socket(threading.Thread):
+class Socket(Thread):
     
     def __init__(self, queue):
         
+        Thread.__init__(self)
         self.socketIO = SocketIO('192.168.43.217', 8080)
         
         self.socketIO.emit('new_room')
@@ -18,33 +16,33 @@ class Socket(threading.Thread):
         self.socketIO.on('new_answer_to_game', self.new_answer)
         
         self.queue = queue
-        self.running = True
+        self.players = []
+        self.stop = False
     
     def run(self):
-        while self.running:
-            self.socketIO.wait() 
-    
+        while True:
+            if self.stop:
+                return
+            self.socketIO.wait(seconds=1) 
+
     def get_room_code(self, code):
         print(code)
+        self.room_code = str(code)
         self.queue.put({'code':code}) 
 
-
     def new_user(self, name):
-        if name not in players:
-            players.append(name)
-            self.queue.put({'players':players})
+        if name not in self.players:
+            self.players.append(name)
+            self.queue.put({'players' : self.players})
 
     def left_user(self, name):
-        if name in players:
-            players.remove(name)
-            self.queue.put({'players':players})
-    
+        if name in self.players:
+            self.players.remove(name)
+            self.queue.put({'players' : self.players})
+
     def new_answer(self, answer):
-        self.queue.put({'answer':answer})
+        self.queue.put({'answer' : answer})
     
-    def terminate(self):
-        self.running = False
-    
-    @staticmethod
-    def test(f):
-        print("SOCKET:",f)
+    def close_room(self):
+        self.socketIO.emit('close_room', self.room_code)
+        self.stop = True

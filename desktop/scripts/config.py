@@ -1,3 +1,4 @@
+import pygame
 import colors
 
 screen_width = 1600
@@ -23,3 +24,12 @@ menu_offset_x = 200
 menu_offset_y = 350
 menu_button_w = 187
 menu_button_h = 62
+
+
+pygame.mixer.pre_init(44100, -16, 2, 4096)
+pygame.mixer.init()
+button_hovered = pygame.mixer.Sound('desktop/sounds/button_hovered.wav')
+button_hovered.set_volume(0.5)
+
+button_clicked = pygame.mixer.Sound('desktop/sounds/button_clicked.wav')
+button_clicked.set_volume(0.5)
