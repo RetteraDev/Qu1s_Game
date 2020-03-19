@@ -1,6 +1,6 @@
 from game_object import GameObject
 from text_object import TextObject
-import config as c
+import sfx
 import pygame
 
 
@@ -13,11 +13,18 @@ class Button(GameObject):
         super().__init__(x, y, w, h)
         self.state = 'normal'
         self.on_click = on_click
+
         self.image = pygame.image.load(f"desktop/Buttons/{self.button_name}.png")
-        
+
         self.normal = pygame.image.load(f"desktop/Buttons/{self.button_name}.png")
+        self.normal = pygame.transform.scale(self.normal, (int(w), int(h)))
+
         self.clicked = pygame.image.load(f"desktop/Buttons/{self.button_name}_clicked.png")
+        self.clicked = pygame.transform.scale(self.clicked, (int(w), int(h)))
+
         self.hovered = pygame.image.load(f"desktop/Buttons/{self.button_name}_hovered.png")
+        self.hovered = pygame.transform.scale(self.hovered, (int(w), int(h)))
+
         self.button_hovered_play = True
 
     @property
@@ -45,7 +52,7 @@ class Button(GameObject):
                 self.state = 'hovered'
                 
             if self.button_hovered_play:
-                c.button_hovered.play(0)
+                sfx.button_hovered.play(0)
                 self.button_hovered_play = False
         else:
             self.state = 'normal'
@@ -54,7 +61,7 @@ class Button(GameObject):
     def handle_mouse_down(self, pos):
         if self.bounds.collidepoint(pos):
             self.state = 'clicked'
-            c.button_clicked.play(0)
+            sfx.button_clicked.play(0)
             
     def handle_mouse_up(self, pos):
         if self.state == 'clicked':

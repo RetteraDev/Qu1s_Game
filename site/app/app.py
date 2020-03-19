@@ -12,5 +12,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 socketio = SocketIO(app)
 
 login_manager = LoginManager(app)
+login_manager.init_app(app)
+login_manager.refresh_view = 'relogin'
+login_manager.needs_refresh_message = (u"Session timedout, please re-login")
+login_manager.needs_refresh_message_category = "info"
+
 db = SQLAlchemy(app)
 

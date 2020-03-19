@@ -1,13 +1,16 @@
 from collections import defaultdict
 from pygame.locals import *
+import configparser
 import pygame
 import sys
 
-
+config = configparser.ConfigParser()
+config.read('desktop/scripts/config.ini')
 
 class Game:
-    def __init__(self, caption, frame_rate):
-        self.frame_rate = frame_rate
+    def __init__(self):
+                
+        self.frame_rate = config.getint('SETTINGS', 'FRAME_RATE')
         self.game_over = False
         
         self.player_objects = []
@@ -15,13 +18,35 @@ class Game:
         
         pygame.init()
         
-        info = pygame.display.Info()
-        max_width = info.current_w
-        max_height = info.current_h
+        max_width = config.getint('SETTINGS', 'SCREEN_WIDTH')
+        max_height = config.getint('SETTINGS', 'SCREEN_HEIGHT')
         
         pygame.font.init()
-        self.surface = pygame.display.set_mode((max_width, max_height)) #, pygame.FULLSCREEN
-        pygame.display.set_caption(caption)
+        
+        try:
+            if config.getboolean('SETTINGS','FULLSCREEN'):
+                self.surface = pygame.display.set_mode((max_width, max_height), pygame.FULLSCREEN)
+            else:
+                info = pygame.display.Info()
+                self.surface = pygame.display.set_mode((max_width, max_height))
+
+        except pygame.error:
+            info = pygame.display.Info()
+            max_width = info.current_w
+            max_height = info.current_h
+            
+            config['SETTINGS']['SCREEN_WIDTH'] = str(max_width)
+            config['SETTINGS']['SCREEN_HEIGHT'] = str(max_height)
+            with open('desktop/scripts/config.ini', 'w') as configfile:
+                config.write(configfile)
+                
+            if config.getboolean('SETTINGS','FULLSCREEN'):
+                self.surface = pygame.display.set_mode((max_width, max_height), pygame.FULLSCREEN)
+            else:
+                info = pygame.display.Info()
+                self.surface = pygame.display.set_mode((max_width, max_height))
+            
+        pygame.display.set_caption(config['SETTINGS']['CAPTION'])
         self.clock = pygame.time.Clock()
         self.keydown_handlers = defaultdict(list)
         self.keyup_handlers = defaultdict(list)

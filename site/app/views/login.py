@@ -1,3 +1,5 @@
+from datetime import timedelta
+from flask import session
 from models.Games import *
 from app import *
 
@@ -6,6 +8,10 @@ from app import *
 def load_user(name):
     return Users.query.get(name)
 
+@app.before_request
+def before_request():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(hours=1)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -30,7 +36,7 @@ def login():
                 player = Users(code, name)
                 db.session.add(player)
                 db.session.commit()
-                login_user(player, remember=True)
+                login_user(player, remember=True, duration=timedelta(hours=1))
 
                 return redirect(url_for('game', code=code))
             

@@ -4,6 +4,7 @@ from random import randint
 from models.Games import *
 from app import *
 
+
 @app.route('/game/<code>', methods = ['GET', 'POST'])
 def game(code):
     
@@ -24,15 +25,18 @@ def game(code):
 
 
 @app.route('/logout', methods = ['GET', 'POST'])
+@login_required
 def logout():
     
     if current_user.is_anonymous:
+        current_user.authenticated = False
         return redirect(url_for('login'))
     else:
         leave_room(str(current_user.code), sid = current_user.name, namespace='/')
         socketio.emit('left_user', current_user.name, room=str(current_user.code))
         db.session.delete(Users.query.filter_by(name=current_user.name).first())
         db.session.commit()
+        current_user.authenticated = False
         logout_user()
         
         flash('Вы вышли', 'success')
